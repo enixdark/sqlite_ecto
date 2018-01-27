@@ -2,7 +2,7 @@ if Code.ensure_loaded?(Sqlitex.Server) do
   defmodule Sqlite.Ecto.Connection do
     @moduledoc false
 
-    @behaviour Ecto.Adapters.SQL.Query
+    @behaviour Ecto.Adapters.SQL.Connection
 
     # Connect to a new Sqlite.Server.  Enable and verify the foreign key
     # constraints for the connection.
@@ -23,6 +23,9 @@ if Code.ensure_loaded?(Sqlitex.Server) do
     end
 
     defdelegate to_constraints(error), to: Sqlite.Ecto.Error
+
+
+    # defdelegate child_spec(options), to: 
 
     ## Transaction
 
@@ -52,6 +55,8 @@ if Code.ensure_loaded?(Sqlitex.Server) do
 
     defdelegate insert(prefix, table, fields, returning), to: Query
 
+    defdelegate insert(prefix, table, headers, fields, on_conflict, returning), to: Query
+
     defdelegate update(prefix, table, fields, filters, returning), to: Query
 
     defdelegate delete(prefix, table, filters, returning), to: Query
@@ -61,5 +66,16 @@ if Code.ensure_loaded?(Sqlitex.Server) do
     alias Sqlite.Ecto.DDL
 
     defdelegate execute_ddl(ddl), to: DDL
+
+    # Raw command
+
+    alias Sqlite.Ecto.Command
+
+    defdelegate prepare_execute(connection, name, prepared, params, options), to: Command
+
+    defdelegate execute(connection, prepared_query, params, options), to: Command
+
+    defdelegate stream(connection, prepared_query, params, options), to: Command
+
   end
 end
