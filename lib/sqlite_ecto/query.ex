@@ -19,7 +19,7 @@ defmodule Sqlite.Ecto.Query do
       %Ecto.Query.Tagged{type: :binary, value: value} when is_binary(value) -> {:blob, value}
       %Ecto.Query.Tagged{value: value} -> value
       %{__struct__: _} = value -> value
-      %{} = value -> json_library.encode! value
+      %{} = value -> json_library().encode! value
       value -> value
     end)
 
@@ -172,7 +172,7 @@ defmodule Sqlite.Ecto.Query do
   # (below), call func.(), and drop the table afterwards.  Returns the
   # result of func.().
   defp with_temp_table(pid, returning, func) do
-    tmp = "t_" <> random_id
+    tmp = "t_" <> random_id()
     fields = Enum.join(returning, ", ")
     results = case exec(pid, "CREATE TEMP TABLE #{tmp} (#{fields})") do
       {:error, _} = err -> err
@@ -185,7 +185,7 @@ defmodule Sqlite.Ecto.Query do
   # Create a trigger to capture the changes from our query, call func.(),
   # and drop the trigger when done.  Returns the result of func.().
   defp with_temp_trigger(pid, table, tmp_tbl, returning, query, ref, func) do
-    tmp = "tr_" <> random_id
+    tmp = "tr_" <> random_id()
     fields = Enum.map_join(returning, ", ", &"#{ref}.#{&1}")
     sql = """
     CREATE TEMP TRIGGER #{tmp} AFTER #{query} ON main.#{table} BEGIN
